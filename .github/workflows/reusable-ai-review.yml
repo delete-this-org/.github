@@ -22,6 +22,6 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
             Review this pull request for logic errors, security issues,
-            missing edge-case handling, and regressions. Follow the
-            standards in the consuming repo's CLAUDE.md. Fail the check
-            if you find a blocking issue.
+            missing edge-case handling, and regressions. Apply the
+            standards in the consuming repo's .github/review-guidelines.md.
+            Fail the check if you find a blocking issue.
