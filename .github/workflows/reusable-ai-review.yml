@@ -1,0 +1,27 @@
+name: reusable-ai-review
+# CENTRALIZED quality gate. Tune the prompt / security posture here ONCE
+# and every repo inherits it. Called by each repo's pr.yml.
+on:
+  workflow_call:
+    secrets:
+      ANTHROPIC_API_KEY:
+        required: true   # caller passes it via `secrets: inherit`
+
+jobs:
+  review:
+    if: github.event.pull_request.head.repo.fork == false   # forks have no secrets
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Review this pull request for logic errors, security issues,
+            missing edge-case handling, and regressions. Follow the
+            standards in the consuming repo's CLAUDE.md. Fail the check
+            if you find a blocking issue.

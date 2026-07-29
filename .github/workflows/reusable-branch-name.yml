@@ -1,0 +1,18 @@
+name: reusable-branch-name
+# CENTRALIZED policy gate. One regex for the whole org.
+# Called by each repo's pr.yml — do not copy this per repo.
+on:
+  workflow_call: {}
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate branch name
+        run: |
+          BRANCH="${{ github.head_ref }}"
+          echo "Branch: $BRANCH"
+          if [[ ! "$BRANCH" =~ ^(feature|bug)/[A-Z]+-[0-9]+ ]]; then
+            echo "::error::Branch must match (feature|bug)/PROJ-123-description"
+            exit 1
+          fi
