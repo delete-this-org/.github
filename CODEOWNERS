@@ -1,4 +1,4 @@
 # Org-wide DEFAULT owners. Lives in the org's `.github` repo and applies to any
 # repo that doesn't define its own .github/CODEOWNERS. Repo-level CODEOWNERS
 # overrides this. Keep this list broad; put path-specific owners in each repo.
-*   @org/reviewers
+*   @delete-this-org/reviewers
