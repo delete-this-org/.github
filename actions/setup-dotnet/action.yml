@@ -1,0 +1,18 @@
+name: setup-dotnet
+description: >
+  Shared .NET setup steps (SDK + restore). This is a COMPOSITE ACTION, not a
+  reusable workflow, because it's a bundle of STEPS that slots inside a job you
+  define locally — used by the build and unit-tests jobs in each repo's pr.yml.
+inputs:
+  dotnet-version:
+    description: .NET SDK version
+    required: false
+    default: '8.0.x'
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ inputs.dotnet-version }}
+    - run: dotnet restore
+      shell: bash
