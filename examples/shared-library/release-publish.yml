@@ -1,0 +1,33 @@
+name: release-publish
+# SHARED LIBRARY shape. Publishes the stable version, gated by the `packages`
+# environment so a human accepts that this API surface goes to every consumer.
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: packages         # ← required reviewers; job waits to start
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: '8.0.x' }        # 🔧
+      - name: Pack at the release version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          dotnet pack -c Release -p:Version="$VERSION" -o ./pkg
+      - name: Push to GitHub Packages
+        run: |
+          dotnet nuget add source \
+            --username ${{ github.actor }} \
+            --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text \
+            --name github "https://nuget.pkg.github.com/YOUR_ORG/index.json"   # 🔧
+          dotnet nuget push "./pkg/*.nupkg" --source github --skip-duplicate
+
+# Published versions are PERMANENT: deletion is awkward, the same version cannot
+# be republished, and consumers who restored it keep their copy. Fix a bad 1.2.4
+# by shipping 1.2.5 — never by replacing it.

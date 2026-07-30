@@ -12,6 +12,15 @@ jobs:
         run: |
           BRANCH="${{ github.head_ref }}"
           echo "Branch: $BRANCH"
+
+          # Automated release PRs are exempt: release-please names its branch
+          # release-please--branches--main, which cannot carry a Jira key.
+          # Without this the release PR fails the check and can never merge.
+          if [[ "$BRANCH" == release-please--* ]]; then
+            echo "release-please branch — exempt from naming policy"
+            exit 0
+          fi
+
           if [[ ! "$BRANCH" =~ ^(feature|bug)/[A-Z]+-[0-9]+ ]]; then
             echo "::error::Branch must match (feature|bug)/PROJ-123-description"
             exit 1

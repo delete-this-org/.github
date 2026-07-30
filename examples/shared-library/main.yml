@@ -1,0 +1,20 @@
+name: main
+# SHARED LIBRARY shape. Builds and packs on every merge but publishes NOTHING —
+# a version reaches the feed only via an approved release (release-publish.yml).
+on:
+  push:
+    branches: [main]
+
+jobs:
+  pack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: YOUR_ORG/.github/actions/setup-dotnet@main
+        with: { dotnet-version: '8.0.x' }        # 🔧
+      - run: dotnet build -c Release --no-restore
+      - run: dotnet test --filter Category=Unit
+      - run: dotnet pack -c Release -o ./pkg
+      # Kept as a run artifact so it can be inspected, not published.
+      - uses: actions/upload-artifact@v4
+        with: { name: nupkg, path: ./pkg/*.nupkg }
